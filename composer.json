@@ -1,0 +1,34 @@
+{
+  "name" : "hnk/migrations-bundle",
+  "description" : "HNK migrations, based on DoctrineMigrations",
+  "type" : "symfony-bundle",
+  "authors" : [{
+    "name" : "Jakub Rapacz",
+    "email" : "dev@hnksoftware.pl"
+  }],
+  "keywords" : [
+    "hnk migrations bundle"
+  ],
+  "license" : [
+    "MIT"
+  ],
+  "require" : {
+    "hnk/common-bundle": "dev-master",
+    "doctrine/doctrine-migrations-bundle": "^1.0"
+  },
+  "autoload" : {
+    "psr-0" : {
+      "Hnk\\MigrationsBundle" : ""
+    }
+  },
+  "target-dir" : "Hnk/MigrationsBundle",
+  "repositories" : [{
+      "type" : "vcs",
+      "url" : "https://github.com/HNKSoftware/CommonBundle.git"
+  }],
+  "extra" : {
+    "branch-alias" : {
+      "dev-master" : "0.1-dev"
+    }
+  }
+}
