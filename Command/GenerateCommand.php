@@ -3,11 +3,12 @@
 namespace Hnk\MigrationsBundle\Command;
 
 use Doctrine\Bundle\MigrationsBundle\Command\MigrationsGenerateDoctrineCommand;
-use Hnk\MigrationsBundle\Migration\FileMigration;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\Tools\Console\Helper\MigrationDirectoryHelper;
+use Hnk\MigrationsBundle\Configuration as BundleConfiguration;
+use Hnk\MigrationsBundle\Migration\AbstractFileMigration;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class GenerateCommand extends MigrationsGenerateDoctrineCommand
@@ -21,11 +22,7 @@ class GenerateCommand extends MigrationsGenerateDoctrineCommand
 namespace <namespace>;
 
 use Doctrine\DBAL\Schema\Schema;
-use Hnk\MigrationsBundle\Migration\<migrationClass>;
 
-/**
- * Auto-generated Migration: Please modify to your needs!
- */
 class Version<version> extends <migrationClass>
 {
     /**
@@ -63,36 +60,20 @@ class Version<version> extends <migrationClass>
     /**
      * @var string
      */
-    private $sqlDirName;
-
-    /**
-     * @var string
-     */
-    private $templateDirName;
-
-    /**
-     * @var string
-     */
-    private $defaultMode;
-
-    /**
-     * @var string
-     */
     private $mode;
 
     /**
-     * GenerateCommand constructor.
-     * @param string $sqlDirectoryName
-     * @param string $templateDirectoryName
-     * @param string $defaultMode
-     * @internal param array $configuration
+     * @var BundleConfiguration
      */
-    public function __construct($sqlDirectoryName, $templateDirectoryName, $defaultMode)
-    {
-        $this->sqlDirName = $sqlDirectoryName;
-        $this->templateDirName = $templateDirectoryName;
-        $this->defaultMode = $defaultMode;
+    private $bundleConfiguration;
 
+    /**
+     * GenerateCommand constructor.
+     * @param BundleConfiguration $bundleConfiguration
+     */
+    public function __construct(BundleConfiguration $bundleConfiguration)
+    {
+        $this->bundleConfiguration = $bundleConfiguration;
         parent::__construct();
     }
 
@@ -102,7 +83,13 @@ class Version<version> extends <migrationClass>
 
         $this
             ->setName('hnk:migrations:generate')
-            ->addOption('mode', null, InputOption::VALUE_REQUIRED, 'Mode sql will generate sql files, mode template will generate files that will require preparation', self::MODE_SQL)
+            ->addOption(
+                'mode',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Mode sql will generate sql files, mode template will generate files that will require preparation',
+                $this->bundleConfiguration->getDefaultMode()
+            )
             ->addOption('db', null, InputOption::VALUE_REQUIRED, 'The database connection to use for this command.')
             ->addOption('em', null, InputOption::VALUE_REQUIRED, 'The entity manager to use for this command.')
             ->addOption('shard', null, InputOption::VALUE_REQUIRED, 'The shard connection to use for this command.');
@@ -112,7 +99,7 @@ class Version<version> extends <migrationClass>
     {
         $this->input = $input;
         $this->output = $output;
-        $this->mode = $input->getOption('mode');
+        $this->mode = $input->getOption('mode'); // todo handle unknown
 
         parent::execute($input, $output);
     }
@@ -174,7 +161,7 @@ class Version<version> extends <migrationClass>
         $replacements = [
             $version,
             $direction,
-            FileMigration::QUERY_SEPARATOR
+            AbstractFileMigration::QUERY_SEPARATOR
         ];
         $template = $this->getSqlTemplate();
         $code = str_replace($placeHolders, $replacements, $template);
@@ -192,7 +179,9 @@ class Version<version> extends <migrationClass>
             throw new \InvalidArgumentException(sprintf('Migrations directory "%s" does not exist.', $dir));
         }
 
-        $dir .= ($this->mode === self::MODE_TEMPLATE) ? $this->templateDirName : $this->sqlDirName;
+        $dir .= ($this->mode === self::MODE_TEMPLATE) ?
+            $this->bundleConfiguration->getTemplateDirectoryName() :
+            $this->bundleConfiguration->getSqlDirectoryName();
 
         if (!file_exists($dir)) {
             mkdir($dir, 0755, true);
@@ -220,10 +209,10 @@ class Version<version> extends <migrationClass>
     {
         switch ($this->mode) {
             case self::MODE_SQL:
-                $class = 'FileMigration';
+                $class = $this->bundleConfiguration->getSqlMigrationClass();
                 break;
             case self::MODE_TEMPLATE:
-                $class = 'PreparedMigration';
+                $class = $this->bundleConfiguration->getPreparedMigrationClass();
                 break;
             default:
                 throw new \Exception('Invalid mode');

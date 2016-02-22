@@ -26,7 +26,6 @@ class PrepareCommand extends ContainerAwareCommand
     {
         $version = $input->getOption('ver');
         $override = ('true' === $input->getOption('override'));
-        $fs = $this->getContainer()->get('filesystem');
 
         $files = [];
         if ($version) {
@@ -52,7 +51,7 @@ class PrepareCommand extends ContainerAwareCommand
         return sprintf(
             '%s/%s',
             rtrim($this->getContainer()->getParameter('doctrine_migrations.dir_name'), '/'),
-            $this->getContainer()->getParameter('hnk_migrations.generate_command.template_directory_name')
+            $this->getContainer()->getParameter('hnk_migrations.template_directory_name')
         );
     }
 

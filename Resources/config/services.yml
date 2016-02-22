@@ -1,19 +1,30 @@
 # todo - change to bundle configuration
 
 parameters:
-    hnk_migrations.generate_command.sql_directory_name: 'sql'
-    hnk_migrations.generate_command.template_directory_name: 'template'
-    hnk_migrations.generate_command.default_mode: 'sql'
+    hnk_migrations.sql_directory_name: 'sql'
+    hnk_migrations.template_directory_name: 'template'
+    hnk_migrations.default_mode: 'sql'
     hnk_migrations.placeholders: {}
+    hnk_migrations.sql_migration_class: "\Hnk\MigrationsBundle\Migration\SqlMigration"
+    hnk_migrations.prepared_migration_class: "\Hnk\MigrationsBundle\Migration\PreparedMigration"
 
 services:
+
+    hnk_migrations.configuration:
+        class: Hnk\MigrationsBundle\Configuration
+        arguments:
+            - '%doctrine_migrations.dir_name%'
+            - '%hnk_migrations.sql_directory_name%'
+            - '%hnk_migrations.template_directory_name%'
+            - '%hnk_migrations.default_mode%'
+            - '%hnk_migrations.placeholders%'
+            - '%hnk_migrations.sql_migration_class%'
+            - '%hnk_migrations.prepared_migration_class%'
 
     hnk_migrations.generate_command:
         class: Hnk\MigrationsBundle\Command\GenerateCommand
         arguments:
-            - '%hnk_migrations.generate_command.sql_directory_name%'
-            - '%hnk_migrations.generate_command.template_directory_name%'
-            - '%hnk_migrations.generate_command.default_mode%'
+            - '@hnk_migrations.configuration'
         tags:
             - { name: console.command }
 
@@ -25,7 +36,5 @@ services:
     hnk_migrations.prepared_migration_handler:
         class: Hnk\MigrationsBundle\Service\PreparedMigrationHandler
         arguments:
-            - '%doctrine_migrations.dir_name%'
-            - '%hnk_migrations.generate_command.sql_directory_name%'
-            - '%hnk_migrations.generate_command.template_directory_name%'
+            - '@hnk_migrations.configuration'
             - '@hnk_migrations.place_holder_translator'

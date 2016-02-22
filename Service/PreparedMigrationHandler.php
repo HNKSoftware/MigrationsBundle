@@ -3,43 +3,29 @@
 
 namespace Hnk\MigrationsBundle\Service;
 
-
+use Hnk\MigrationsBundle\Configuration as BundleConfiguration;
 use Hnk\MigrationsBundle\Exceptions\SqlFileAlreadyExistsException;
 
 class PreparedMigrationHandler
 {
     /**
-     * @var string
-     */
-    private $sqlDirectoryName;
-
-    /**
-     * @var string
-     */
-    private $templateDirectoryName;
-    /**
      * @var PlaceHolderTranslator
      */
     private $placeHolderTranslator;
-
     /**
-     * @var string
+     * @var BundleConfiguration
      */
-    private $migrationsDirectory;
+    private $bundleConfiguration;
 
     /**
      * PreparedMigrationHandler constructor.
-     * @param string $migrationsDirectory
-     * @param string $sqlDirectoryName
-     * @param string $templateDirectoryName
+     * @param BundleConfiguration $bundleConfiguration
      * @param PlaceHolderTranslator $placeHolderTranslator
      */
-    public function __construct($migrationsDirectory, $sqlDirectoryName, $templateDirectoryName, PlaceHolderTranslator $placeHolderTranslator)
+    public function __construct(BundleConfiguration $bundleConfiguration, PlaceHolderTranslator $placeHolderTranslator)
     {
-        $this->sqlDirectoryName = $sqlDirectoryName;
-        $this->templateDirectoryName = $templateDirectoryName;
+        $this->bundleConfiguration = $bundleConfiguration;
         $this->placeHolderTranslator = $placeHolderTranslator;
-        $this->migrationsDirectory = $migrationsDirectory;
     }
 
     /**
@@ -77,11 +63,11 @@ class PreparedMigrationHandler
 
     protected function getTemplateDirectoryPath()
     {
-        return $this->migrationsDirectory . '/' . $this->templateDirectoryName;
+        return $this->bundleConfiguration->getMigrationsDirectory() . '/' . $this->bundleConfiguration->getTemplateDirectoryName();
     }
 
     protected function getSqlDirectoryPath()
     {
-        return $this->migrationsDirectory . '/' . $this->sqlDirectoryName;
+        return $this->bundleConfiguration->getMigrationsDirectory() . '/' . $this->bundleConfiguration->getSqlDirectoryName();
     }
 }

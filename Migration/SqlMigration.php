@@ -2,7 +2,7 @@
 
 namespace Hnk\MigrationsBundle\Migration;
 
-abstract class FileMigration extends AbstractFileMigration
+abstract class SqlMigration extends AbstractFileMigration
 {
     protected function loadFile($path)
     {
