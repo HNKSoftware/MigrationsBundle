@@ -12,7 +12,7 @@ abstract class PreparedMigration extends AbstractFileMigration implements Contai
     /**
      * @var ContainerInterface
      */
-    private $container;
+    protected $container;
 
     public function setContainer(ContainerInterface $container = null)
     {
