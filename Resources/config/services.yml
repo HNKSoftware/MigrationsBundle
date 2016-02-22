@@ -1,4 +1,31 @@
+# todo - change to bundle configuration
+
+parameters:
+    hnk_migrations.generate_command.sql_directory_name: 'sql'
+    hnk_migrations.generate_command.template_directory_name: 'template'
+    hnk_migrations.generate_command.default_mode: 'sql'
+    hnk_migrations.placeholders: {}
+
 services:
-#    hnk_migrations.example:
-#        class: Hnk\MigrationsBundle\Example
-#        arguments: ["@service_id", "plain_value", %parameter%]
+
+    hnk_migrations.generate_command:
+        class: Hnk\MigrationsBundle\Command\GenerateCommand
+        arguments:
+            - '%hnk_migrations.generate_command.sql_directory_name%'
+            - '%hnk_migrations.generate_command.template_directory_name%'
+            - '%hnk_migrations.generate_command.default_mode%'
+        tags:
+            - { name: console.command }
+
+    hnk_migrations.place_holder_translator:
+        class: Hnk\MigrationsBundle\Service\PlaceHolderTranslator
+        arguments:
+            - '%hnk_migrations.placeholders%'
+
+    hnk_migrations.prepared_migration_handler:
+        class: Hnk\MigrationsBundle\Service\PreparedMigrationHandler
+        arguments:
+            - '%doctrine_migrations.dir_name%'
+            - '%hnk_migrations.generate_command.sql_directory_name%'
+            - '%hnk_migrations.generate_command.template_directory_name%'
+            - '@hnk_migrations.place_holder_translator'
