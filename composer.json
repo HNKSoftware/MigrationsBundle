@@ -13,7 +13,6 @@
     "MIT"
   ],
   "require" : {
-    "hnk/common-bundle": "dev-master",
     "doctrine/doctrine-migrations-bundle": "^1.0"
   },
   "autoload" : {
@@ -22,10 +21,6 @@
     }
   },
   "target-dir" : "Hnk/MigrationsBundle",
-  "repositories" : [{
-      "type" : "vcs",
-      "url" : "https://github.com/HNKSoftware/CommonBundle.git"
-  }],
   "extra" : {
     "branch-alias" : {
       "dev-master" : "0.1-dev"
