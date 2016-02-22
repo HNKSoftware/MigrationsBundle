@@ -5,8 +5,8 @@ parameters:
     hnk_migrations.template_directory_name: 'template'
     hnk_migrations.default_mode: 'sql'
     hnk_migrations.placeholders: {}
-    hnk_migrations.sql_migration_class: "\Hnk\MigrationsBundle\Migration\SqlMigration"
-    hnk_migrations.prepared_migration_class: "\Hnk\MigrationsBundle\Migration\PreparedMigration"
+    hnk_migrations.sql_migration_class: '\Hnk\MigrationsBundle\Migration\SqlMigration'
+    hnk_migrations.prepared_migration_class: '\Hnk\MigrationsBundle\Migration\PreparedMigration'
 
 services:
 
