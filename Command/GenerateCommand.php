@@ -90,6 +90,12 @@ class Version<version> extends <migrationClass>
                 'Mode sql will generate sql files, mode template will generate files that will require preparation',
                 $this->bundleConfiguration->getDefaultMode()
             )
+            ->addOption(
+                'name',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Additional name for migration'
+            )
             ->addOption('db', null, InputOption::VALUE_REQUIRED, 'The database connection to use for this command.')
             ->addOption('em', null, InputOption::VALUE_REQUIRED, 'The entity manager to use for this command.')
             ->addOption('shard', null, InputOption::VALUE_REQUIRED, 'The shard connection to use for this command.');
@@ -106,13 +112,17 @@ class Version<version> extends <migrationClass>
 
     protected function generateMigration(Configuration $configuration, InputInterface $input, $version, $up = null, $down = null)
     {
+        if ($input->hasOption('name')) {
+            $name = trim(preg_replace('/[^a-zA-Z0-9]+/', '_', $input->getOption('name')), '_');
+        }
+
         $migrationDirectoryHelper = new MigrationDirectoryHelper($configuration);
         $dir = $migrationDirectoryHelper->getMigrationDirectory();
         $filesDir = $this->getMigrationFilesDirectory($dir);
 
-        $fileUp = $this->createSqlFile($filesDir, $version, 'up');
+        $fileUp = $this->createSqlFile($filesDir, $version, 'up', $name);
         $this->output->writeln(sprintf('Generated new migration file to "<info>%s</info>"', $fileUp));
-        $fileDown = $this->createSqlFile($filesDir, $version, 'down');
+        $fileDown = $this->createSqlFile($filesDir, $version, 'down', $name);
         $this->output->writeln(sprintf('Generated new migration file to "<info>%s</info>"', $fileDown));
 
         $placeHolders = [
@@ -144,9 +154,10 @@ class Version<version> extends <migrationClass>
     }
 
 
-    protected function createSqlFile($dir, $version, $direction)
+    protected function createSqlFile($dir, $version, $direction, $name = null)
     {
-        $fileName = sprintf('version_%s_%s.sql', $version, $direction);
+        $namePart = (null !== $name) ? '_' . $name : '';
+        $fileName = sprintf('version_%s_%s%s.sql', $version, $direction, $namePart);
         $filePath = $dir . '/' . $fileName;
 
         if (file_exists($filePath)) {
